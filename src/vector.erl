@@ -1,5 +1,7 @@
 -module(vector).
 
+-include("vector.hrl").
+
 -export([multiply/2]).
 -export([dot_prod/2]).
 -export([schur_prod/2]).
@@ -35,10 +37,12 @@ on_load() ->
 	erlang:load_nif(filename:join(PrivDir, "erl_vector"), 0).
 	%erlang:load_nif(filename:join(PrivDir, atom_to_list(?MODULE)), 0).
 
+-spec randn(Row::pos_integer(), Column::pos_integer()) -> matrix().
 randn(Row, Column) ->
     M = [ << <<(rand:normal()):32/float-native>> || _ <- lists:seq(1, Column)>> || _ <- lists:seq(1, Row)],
     [ build_vector(V) || V <- M ].
         
+-spec shuffle_divide([vector()], pos_integer()) -> [[vector()]].
 shuffle_divide([], _MiniBatchSize) ->
     [];
 shuffle_divide(VectorList, MiniBatchSize) ->
@@ -65,6 +69,7 @@ shuffle_divide(VectorList, MiniBatchSize) ->
             [lists:map(fun(I) -> maps:get(I, NewVM) end, lists:seq(Len - Rest + 1, Len))|MBs]
     end.
 
+-spec shuffle_by(#{non_neg_integer() => vector()}, non_neg_integer()) -> #{non_neg_integer() => vector()}.
 shuffle_by(M, 1) ->
     M;
 shuffle_by(M, I) ->
@@ -73,37 +78,47 @@ shuffle_by(M, I) ->
     VJ = maps:get(J, M),
     shuffle_by(M#{I := VJ, J := VI}, I - 1).
 
--spec digit_to_vector(0..9) -> binary().
+%% just for MNIST data: transform a digit to target vector from  output layer
+-spec digit_to_vector(0..9) -> vector().
 digit_to_vector(Dig) ->
     Bin = <<(binary:copy(<<0.0:32/float-native>>,Dig))/binary, 1.0:32/float-native, (binary:copy(<<0.0:32/float-native>>, 10 - Dig - 1))/binary>>,
     build_vector(Bin).
 
+-spec build_vector(binary()) -> vector().
 build_vector(_Bin) ->
 	erlang:nif_error({not_loaded, ?MODULE}).
 
+-spec transpose(matrix()) -> matrix().
 transpose(_M) ->
 	erlang:nif_error({not_loaded, ?MODULE}).
 
+-spec multiply(matrix(), vector()) -> vector().
 multiply(L, V) ->
     Res = << <<(dot_prod(X, V)):32/float-native>> || X <- L >>,
     build_vector(Res).
 
+-spec dot_prod(vector(), vector()) -> float().
 dot_prod(_V1, _V2) ->
 	erlang:nif_error({not_loaded, ?MODULE}).
 
+-spec v_multiply_v(vector(), vector()) -> matrix().
 v_multiply_v(_V1, _V2) ->
 	erlang:nif_error({not_loaded, ?MODULE}).
 
+-spec schur_prod(vector(), vector()) -> vector().
 schur_prod(_V1, _V2) ->
 	erlang:nif_error({not_loaded, ?MODULE}).
 
+-spec sumlist([vector()]) -> vector().
 sumlist(_VList) ->
 	erlang:nif_error({not_loaded, ?MODULE}).
 
 %% V1 + V2 * Scale
+-spec add_scalev(vector(), vector(), float()) -> vector().
 add_scalev(_V1, _V2, _Scale) ->
 	erlang:nif_error({not_loaded, ?MODULE}).
 
+-spec add(vector(), vector()) -> vector().
 add(_V1, _V2) ->
 	erlang:nif_error({not_loaded, ?MODULE}).
 
@@ -116,11 +131,14 @@ sigmoid(_ResObj) ->
 sigmoid_prime(_ResObj) ->
 	erlang:nif_error({not_loaded, ?MODULE}).
 
+-spec argmax(vector()) -> non_neg_integer().
 argmax(_ResObj) ->
 	erlang:nif_error({not_loaded, ?MODULE}).
 
+-spec get_vectorbin(vector()) -> binary().
 get_vectorbin(_ResObj) ->
 	erlang:nif_error({not_loaded, ?MODULE}).
 
+-spec mexp_vector(vector()) -> vector().
 mexp_vector(_ResObj) ->
 	erlang:nif_error({not_loaded, ?MODULE}).
