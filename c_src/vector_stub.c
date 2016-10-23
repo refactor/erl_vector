@@ -427,6 +427,22 @@ static ERL_NIF_TERM mexp_vector(ErlNifEnv* env,int UNUSED argc, const ERL_NIF_TE
     return ret;
 }
 
+static ERL_NIF_TERM log_vector(ErlNifEnv* env,int UNUSED argc, const ERL_NIF_TERM argv[] ) {
+    vector_res* vec_res;
+    if (!enif_get_resource(env, argv[0], VECTOR_RES_TYPE, (void**)&vec_res))
+        return enif_make_badarg(env);
+
+    vector_res* res = make_vector_res(vec_res->dim);
+    if (res == NULL) 
+        return enif_make_tuple2(env, enif_make_atom(env, "error"), enif_make_atom(env, "OOM"));
+
+    vec_log(res->components, vec_res->components, vec_res->dim);
+
+    ERL_NIF_TERM ret = enif_make_resource(env, res);
+    enif_release_resource(res);
+    return ret;
+}
+
 static ERL_NIF_TERM stub_sigmoid(ErlNifEnv* env,int UNUSED argc, const ERL_NIF_TERM argv[] ) {
     vector_res* vec_res;
     if (!enif_get_resource(env, argv[0], VECTOR_RES_TYPE, (void**)&vec_res))
@@ -488,9 +504,10 @@ static ErlNifFunc nif_funcs[] = {
     {"cost_derivative", 2, cost_derivative},
     {"v_multiply_v",    2, v_multiply_v},
     {"argmax",          1, argmax},
-	{"sumlist",         1, sumlist},
+    {"sumlist",         1, sumlist},
     {"get_vectorbin",   1, get_vectorbin}
-	,{"mexp_vector",    1, mexp_vector}
+    ,{"log_vector",    1, log_vector}
+    ,{"mexp_vector",   1, mexp_vector}
 };
 
 ERL_NIF_INIT(vector, nif_funcs, load, NULL, upgrade, unload)

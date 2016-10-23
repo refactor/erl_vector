@@ -22,7 +22,9 @@
 -export([digit_to_vector/1]).
 -export([build_vector/1]).
 -export([get_vectorbin/1]).
+
 -export([mexp_vector/1]).
+-export([log_vector/1]).
 
 -on_load(on_load/0).
 on_load() ->
@@ -139,4 +141,8 @@ get_vectorbin(_ResObj) ->
 
 -spec mexp_vector(vector()) -> vector().
 mexp_vector(_ResObj) ->
+	erlang:nif_error({not_loaded, ?MODULE}).
+
+-spec log_vector(vector()) -> vector().
+log_vector(_ResObj) ->
 	erlang:nif_error({not_loaded, ?MODULE}).

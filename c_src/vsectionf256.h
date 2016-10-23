@@ -23,8 +23,8 @@
 * This header file defines operators and functions for these vectors.
 *
 * For example:
-* fvec_section a(1., 2., 3., 4.), b(5., 6., 7., 8.), c;
-* c = simd_add(a, b);     // now c contains (6., 8., 10., 12.)
+* fvec_section a(1.f, 2.f, 3.f, 4.f), b(5.f, 6.f, 7.f, 8.f), c;
+* c = simd_add(a, b);     // now c contains (6.f, 8.f, 10.f, 12.f)
 *
 *
 * (c) Copyright 2016 - 2016 GNU General Public License http://www.gnu.org/licenses
@@ -58,9 +58,13 @@ typedef __m256 fvec_section;
 #define simd_sub(a, b) _mm256_sub_ps(to_vec8f(a), to_vec8f(b))
 #define simd_round(a)  _mm256_round_ps(to_vec8f(a), 0+8)
 #define simd_shift_left(a, n) _Generic((a), __m256:vec8f_shift_left, __m256i: vec8i_shift_left)(a, n)
-// trunc fraction: 3.14 -> 3.00
+// trunc fraction: 3.14f -> 3.00f
 #define simd_trunc_fraction(a) ({ __m256i w = _mm256_cvttps_epi32(a); _mm256_cvtepi32_ps(w); })
+// : 3.14f -> 3 -> 4.2038E-45
 #define simd_reinterpret_trunced_f(a) ({__m256i vi = _mm256_cvttps_epi32(a); _mm256_castsi256_ps(vi); })
+// reinterpret: 3.14 -> 107852331 -> 107852331.0f
+#define simd_reinterpret_f(f) ({ __m256i i = _mm256_castps_si256(f); _mm256_cvtepi32_ps(i); })
+// reinterpret: 3.14 -> 107852331
 #define simd_init_by(x) _mm256_set1_ps(((float)(x)))
 #define simd_unary_minus(a) _mm256_xor_ps(to_vec8f(a), constant8f((int)0x80000000,(int)0x80000000,(int)0x80000000,(int)0x80000000,(int)0x80000000,(int)0x80000000,(int)0x80000000,(int)0x80000000))
 #define simd_approx_recipr(a) _mm256_rcp_ps(to_vec8f(a))
@@ -69,6 +73,7 @@ typedef __m256 fvec_section;
 // is a < b
 #define simd_lessthan(a, b) _mm256_cmp_ps(to_vec8f(a), to_vec8f(b), 1)
 #define simd_and(a, b) _mm256_and_ps(to_vec8f(a), to_vec8f(b)) 
+#define simd_or(a, b) _mm256_or_ps(to_vec8f(a), to_vec8f(b)) 
 
 // Select between two operands. Corresponds to this pseudocode:
 // for (int i = 0; i < 8; i++) result[i] = s[i] ? a[i] : b[i];

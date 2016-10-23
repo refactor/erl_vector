@@ -4,6 +4,31 @@
 #include "vsection.h"   // choose vsectionf256.h
 #include "vsectionmath_common.h"  
 
+static inline fvec_section fastlog2(const fvec_section x) {
+    fvec_section y = simd_reinterpret_f(x);
+    union { uint32_t i; float f; } c = {(uint32_t)0x007FFFFF};
+    union { uint32_t i; float f; } c2 = {(uint32_t)0x3f000000};
+    fvec_section mxf = simd_or(simd_and(x, c.f), c2.f);
+    y = simd_mul(y, 1.1920928955078125e-7f);
+    //x = simd_nmul_add(r, ln2f_hi, x);  // x -= r * ln2f_hi;
+    fvec_section tmp = simd_nmul_add(1.498030302f, mxf, simd_sub(y, 124.22551499f));
+    return simd_sub(tmp, simd_div(1.72587999f, simd_add(0.3520887068f, mxf)));
+}
+
+static inline fvec_section fastlog(const fvec_section x) {
+    return simd_mul(0.69314718f, fastlog2(x));
+}
+
+static inline fvec_section fasterlog(const fvec_section x) {
+    fvec_section y = simd_reinterpret_f(x);
+    return simd_mul_add(y, 8.2629582881927490e-8f, -87.989971088f);
+}
+
+static inline fvec_section fasterlog2(const fvec_section x) {
+    fvec_section y = simd_reinterpret_f(x);
+    return simd_mul_add(y, 1.1920928955078125e-7f, -126.94269504f);
+}
+
 static inline fvec_section polynomial_5(const fvec_section x, float c0, float c1, float c2, float c3, float c4, float c5) {
     // calculates polynomial c5*x^5 + c4*x^4 + c3*x^3 + c2*x^2 + c1*x + c0
     // VTYPE may be a vector type, CTYPE is a scalar type

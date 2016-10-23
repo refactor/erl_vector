@@ -17,6 +17,16 @@ vec_dotprod(const float* v1, const float* v2, const size_t dim) {
 }
 
 void
+vec_log(float* y, const float* x, const size_t dim) {
+    const size_t section_num = (int)ceil((double)dim / SECTION_LEN);
+    for (size_t i = 0; i < section_num; ++i) {
+        fvec_section fvec = simd_load(x + i * SECTION_LEN);
+        fvec_section tmp = fastlog(fvec);
+        simd_store(y + i * SECTION_LEN, tmp);
+    }
+}
+
+void
 vec_sigmoid(float* a, const float* z, const size_t dim) {
     const size_t section_num = (int)ceil((double)dim / SECTION_LEN);
     for (size_t i = 0; i < section_num; ++i) {

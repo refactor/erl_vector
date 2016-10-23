@@ -1,5 +1,6 @@
 extern const size_t SECTION_LEN;
 
+void vec_log(float* y, const float* x, const size_t dim);
 extern void vec_sigmoid(float* a, const float* z, const size_t dim);
 extern void vec_sigmoid_prime(float* a, const float* z, const size_t dim);
 
