@@ -1,0 +1,7 @@
+{application, erl_vector, [
+    {description, "A vector math library for neuron-network"},
+    {vsn, "0.0.1"},
+    {registered, []},
+    {applications, [kernel, stdlib]},
+    {modules, [vector]}
+]}.

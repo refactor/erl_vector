@@ -1,0 +1,15 @@
+.DS_Store
+.ycm_extra_conf.py*
+*.so
+*.o
+*.tar.gz
+*.asc
+*.dig
+*.sw[op]
+*.beam
+*.dump
+*.d
+.erlang.mk/
+deps/
+ebin/
+c_src/env.mk
