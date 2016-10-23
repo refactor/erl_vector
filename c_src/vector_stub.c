@@ -74,8 +74,8 @@ static ErlNifResourceType* VECTOR_RES_TYPE;
 static int
 open_resource(ErlNifEnv* env)
 {
-    const char* mod = "resources";
-    const char* name = "vector";
+    const char* mod = "vector";
+    const char* name = "vector_object";
     int flags = ERL_NIF_RT_CREATE | ERL_NIF_RT_TAKEOVER;
 
     VECTOR_RES_TYPE = enif_open_resource_type(env, mod, name, del_vector_res, flags, NULL);

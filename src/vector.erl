@@ -26,16 +26,14 @@
 
 -on_load(on_load/0).
 on_load() ->
-	PrivDir = case code:priv_dir(?MODULE) of
+	PrivDir = case code:priv_dir(erl_vector) of
 		{error, _} ->
 			AppPath = filename:dirname(filename:dirname("erl_vector")),
-			%AppPath = filename:dirname(filename:dirname(code:which(?MODULE))),
 			filename:join(AppPath, "priv");
 		Path ->
 			Path
 	end,
 	erlang:load_nif(filename:join(PrivDir, "erl_vector"), 0).
-	%erlang:load_nif(filename:join(PrivDir, atom_to_list(?MODULE)), 0).
 
 -spec randn(Row::pos_integer(), Column::pos_integer()) -> matrix().
 randn(Row, Column) ->
